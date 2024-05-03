@@ -60,9 +60,10 @@ func (r *DbManageReconciler) StartLoopTask() {
 					if err != nil {
 						operatorcodehorsecomv1beta1.L().Error().Msgf("%s备份任务失败, 原因: %s", dbManage.Name, err.Error())
 						dbManage.Status.LastTaskResult = fmt.Sprintf("%s备份任务失败, 原因: %s", dbManage.Name, err.Error())
+					} else {
+						operatorcodehorsecomv1beta1.L().Info().Msgf("%s备份任务成功", dbManage.Name)
+						dbManage.Status.LastTaskResult = fmt.Sprintf("%s备份任务成功", dbManage.Name)
 					}
-					operatorcodehorsecomv1beta1.L().Info().Msgf("%s备份任务成功", dbManage.Name)
-					dbManage.Status.LastTaskResult = fmt.Sprintf("%s备份任务成功", dbManage.Name)
 				case 1:
 					// 巡检任务
 					// TODO

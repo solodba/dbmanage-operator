@@ -45,6 +45,7 @@ func (r *DbManageReconciler) StartLoopTask() {
 				<-ticker.C
 				// 重置ticker
 				ticker.Reset(time.Minute * time.Duration(dbManage.Spec.Period))
+				operatorcodehorsecomv1beta1.L().Info().Msgf("%s任务将在%d分钟后循环执行", dbManage.Name, dbManage.Spec.Period)
 				// 更新任务状态
 				dbManage.Status.Active = true
 				dbManage.Status.NextTime = int(r.GetTaskNextTime(float64(dbManage.Spec.Period * 60)).Unix())

@@ -14,6 +14,11 @@ import (
 // 数据库备份任务
 func (r *DbManageReconciler) DbBackupTask(dbManage *operatorcodehorsecomv1beta1.DbManage) error {
 	// 备份任务
+	defer func() {
+		if err := recover(); err != nil {
+			operatorcodehorsecomv1beta1.L().Error().Msgf("发生错误, %v", err)
+		}
+	}()
 	dbBackupDir := "/tmp/dbbackup"
 	_, err := os.Stat(dbBackupDir)
 	if err != nil {

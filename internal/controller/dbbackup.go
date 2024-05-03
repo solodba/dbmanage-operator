@@ -1,11 +1,13 @@
 package controller
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
 	"time"
 
+	"github.com/minio/minio-go/v7"
 	operatorcodehorsecomv1beta1 "github.com/solodba/dbmanage-operator/api/v1beta1"
 )
 
@@ -35,6 +37,25 @@ func (r *DbManageReconciler) DbBackupTask(dbManage *operatorcodehorsecomv1beta1.
 		return err
 	}
 	// 同步备份文件到MinIO
-
+	minioClient, err := r.InitialMinioClient(dbManage)
+	if err != nil {
+		return err
+	}
+	f, err := os.Open(fmt.Sprintf("%s/%s", dbBackupDir, fileName))
+	if err != nil {
+		operatorcodehorsecomv1beta1.L().Error().Msgf("打开备份文件%s失败", fileName)
+		return err
+	}
+	_, err = minioClient.PutObject(
+		context.TODO(),
+		dbManage.Spec.Destination.BucketName,
+		fmt.Sprintf("%s/%s", dbBackupDir, fileName),
+		f,
+		-1,
+		minio.PutObjectOptions{})
+	if err != nil {
+		operatorcodehorsecomv1beta1.L().Error().Msgf("上传备份文件%s到minio失败", fileName)
+		return err
+	}
 	return nil
 }

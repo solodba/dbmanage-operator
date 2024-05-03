@@ -25,17 +25,52 @@ import (
 
 // DbManageSpec defines the desired state of DbManage
 type DbManageSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// 是否开启任务
+	Enable bool `json:"enable"`
+	// 任务类型标识(0: 备份任务 1: 监控任务 ...)
+	Flag int `json:"flag"`
+	// 任务开始时间
+	StartTime string `json:"startTime"`
+	// 任务间隔时间(分钟)
+	Period int `json:"period"`
+	// 数据库源地址
+	Origin *Origin `json:"origin"`
+	// 目标地址(MinIO)
+	Destination *Destination `json:"destination"`
+}
 
-	// Foo is an example field of DbManage. Edit dbmanage_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+// 数据库源地址
+type Origin struct {
+	// 数据库IP地址
+	Host string `json:"host"`
+	// 数据库端口
+	Port int32 `json:"port"`
+	// 数据库用户名
+	Username string `json:"username"`
+	// 数据库密码
+	Password string `json:"password"`
+}
+
+// 目标地址(MinIO)
+type Destination struct {
+	// MinIO地址
+	Endpoint string `json:"endpoint"`
+	// MinIO访问的key
+	AccessKey string `json:"accessKey"`
+	// MinIO访问的密钥
+	AccessSecret string `json:"accessSecret"`
+	// MinIO令牌桶名称
+	BucketName string `json:"bucketName"`
 }
 
 // DbManageStatus defines the observed state of DbManage
 type DbManageStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// 任务状态是否为活动
+	Active bool `json:"active"`
+	// 任务下次启动时间(时间戳)
+	NextTime int `json:"nextTime"`
+	// 最后一次任务运行情况
+	LastTaskResult string `json:"lastTaskResult"`
 }
 
 //+kubebuilder:object:root=true

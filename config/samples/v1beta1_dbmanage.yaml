@@ -6,4 +6,16 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
   name: dbmanage-sample
 spec:
-  # TODO(user): Add fields here
+  enable: true
+  startTime: "13:35"
+  period: 1
+  origin:
+    host: "10.244.3.17"
+    port: 3306
+    username: "root"
+    password: "Root_123"
+  destination:
+    endpoint: ""
+    accessKey: ""
+    accessSecret: ""
+    bucketName: ""

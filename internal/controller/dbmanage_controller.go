@@ -68,6 +68,7 @@ func (r *DbManageReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 			return ctrl.Result{}, fmt.Errorf("%s任务没有发生任务变化", dbManageK8s.Name)
 		}
 	}
+	// 任务发生变化或者没有该任务则添加进队列
 	r.AddQueue(dbManageK8s)
 	return ctrl.Result{}, nil
 }

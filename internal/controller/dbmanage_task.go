@@ -11,7 +11,11 @@ import (
 
 // 停止任务循环
 func (r *DbManageReconciler) StopLoopTask() {
-
+	for _, ticker := range r.Tickers {
+		if ticker != nil {
+			ticker.Stop()
+		}
+	}
 }
 
 // 开启任务循环

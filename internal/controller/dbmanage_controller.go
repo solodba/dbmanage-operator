@@ -18,7 +18,10 @@ package controller
 
 import (
 	"context"
+	"fmt"
+	"reflect"
 
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -30,7 +33,8 @@ import (
 // DbManageReconciler reconciles a DbManage object
 type DbManageReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	Scheme        *runtime.Scheme
+	DbManageQueue map[string]*operatorcodehorsecomv1beta1.DbManage
 }
 
 //+kubebuilder:rbac:groups=operator.codehorse.com,resources=dbmanages,verbs=get;list;watch;create;update;patch;delete
@@ -48,9 +52,23 @@ type DbManageReconciler struct {
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.17.3/pkg/reconcile
 func (r *DbManageReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
-
-	// TODO(user): your logic here
-
+	dbManageK8s := operatorcodehorsecomv1beta1.NewDbManage()
+	err := r.Client.Get(ctx, req.NamespacedName, dbManageK8s)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			// 该任务不存在, 则从队列中删除
+			r.DeleteQueue(dbManageK8s)
+			return ctrl.Result{}, err
+		}
+		return ctrl.Result{}, err
+	}
+	// 任务存在, 则对比队列中的任务是否发生改变
+	if dbManage, ok := r.DbManageQueue[dbManageK8s.Name]; ok {
+		if reflect.DeepEqual(dbManageK8s, dbManage) {
+			return ctrl.Result{}, fmt.Errorf("%s任务没有发生任务变化", dbManageK8s.Name)
+		}
+	}
+	r.AddQueue(dbManageK8s)
 	return ctrl.Result{}, nil
 }
 

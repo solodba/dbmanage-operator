@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"sync"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -35,6 +36,7 @@ type DbManageReconciler struct {
 	client.Client
 	Scheme        *runtime.Scheme
 	DbManageQueue map[string]*operatorcodehorsecomv1beta1.DbManage
+	Lock          sync.RWMutex
 }
 
 //+kubebuilder:rbac:groups=operator.codehorse.com,resources=dbmanages,verbs=get;list;watch;create;update;patch;delete

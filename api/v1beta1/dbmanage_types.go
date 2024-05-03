@@ -27,7 +27,7 @@ import (
 type DbManageSpec struct {
 	// 是否开启任务
 	Enable bool `json:"enable"`
-	// 任务类型标识(0: 备份任务 1: 监控任务 ...)
+	// 任务类型标识(0: 备份任务 1: 巡检任务 ...)
 	Flag int `json:"flag"`
 	// 任务开始时间
 	StartTime string `json:"startTime"`

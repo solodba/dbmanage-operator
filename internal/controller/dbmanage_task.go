@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	operatorcodehorsecomv1beta1 "github.com/solodba/dbmanage-operator/api/v1beta1"
@@ -49,7 +50,18 @@ func (r *DbManageReconciler) StartLoopTask() {
 				dbManage.Status.NextTime = int(r.GetTaskNextTime(float64(dbManage.Spec.Period * 60)).Unix())
 				switch dbManage.Spec.Flag {
 				case 0:
+					// 备份任务
+					err := r.DbBackupTask(dbManage)
+					if err != nil {
+						operatorcodehorsecomv1beta1.L().Error().Msgf("%s备份任务失败, 原因: %s", dbManage.Name, err.Error())
+						dbManage.Status.LastTaskResult = fmt.Sprintf("%s备份任务失败, 原因: %s", dbManage.Name, err.Error())
+					}
+					operatorcodehorsecomv1beta1.L().Error().Msgf("%s备份任务成功", dbManage.Name)
+					dbManage.Status.LastTaskResult = fmt.Sprintf("%s备份任务成功", dbManage.Name)
 				case 1:
+					// 巡检任务
+					// TODO
+
 				default:
 				}
 				// 更新任务状态

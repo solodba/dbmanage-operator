@@ -46,7 +46,7 @@ func (r *DbManageReconciler) StartLoopTask() {
 				ticker.Reset(time.Minute * time.Duration(dbManage.Spec.Period))
 				// 更新任务状态
 				dbManage.Status.Active = true
-				dbManage.Status.NextTime = int(r.GetTaskNextTime(float64(dbManage.Spec.Period)).Unix())
+				dbManage.Status.NextTime = int(r.GetTaskNextTime(float64(dbManage.Spec.Period * 60)).Unix())
 				switch dbManage.Spec.Flag {
 				case 0:
 				case 1:

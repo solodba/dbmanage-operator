@@ -84,13 +84,13 @@ func (r *DbManageReconciler) UpdateDbManageStatus(dbManage *operatorcodehorsecom
 	dbMangeK8s := operatorcodehorsecomv1beta1.NewDbManage()
 	err := r.Client.Get(ctx, namespaceName, dbMangeK8s)
 	if err != nil {
-		operatorcodehorsecomv1beta1.L().Error().Msgf("获取k8s中DbManage任务%s失败", dbManage.Name)
+		operatorcodehorsecomv1beta1.L().Error().Msgf("获取k8s中DbManage任务%s失败, 原因:%s", dbManage.Name, err.Error())
 		return
 	}
 	dbMangeK8s.Status = dbManage.Status
 	err = r.Client.Status().Update(ctx, dbMangeK8s)
 	if err != nil {
-		operatorcodehorsecomv1beta1.L().Error().Msgf("更新k8s中DbManage任务%s的Status状态失败", dbManage.Name)
+		operatorcodehorsecomv1beta1.L().Error().Msgf("更新k8s中DbManage任务%s的Status状态失败, 原因:%s", dbManage.Name, err.Error())
 		return
 	}
 }

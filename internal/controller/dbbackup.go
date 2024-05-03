@@ -2,7 +2,6 @@ package controller
 
 import (
 	"fmt"
-	"os"
 	"os/exec"
 	"time"
 
@@ -13,9 +12,11 @@ import (
 func (r *DbManageReconciler) CreateDir(dbMange *operatorcodehorsecomv1beta1.DbManage) error {
 	switch dbMange.Spec.Flag {
 	case 0:
-		return os.MkdirAll("/tmp/dbbackup", 0755)
+		_, err := exec.Command("mkdir -p /tmp/dbbackup").Output()
+		return err
 	case 1:
-		return os.MkdirAll("/tmp/dbcheck", 0755)
+		_, err := exec.Command("mkdir -p /tmp/dbcheck").Output()
+		return err
 	default:
 		return fmt.Errorf("不支持该类型的任务")
 	}

@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"reflect"
 	"sync"
+	"time"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -37,6 +38,8 @@ type DbManageReconciler struct {
 	Scheme        *runtime.Scheme
 	DbManageQueue map[string]*operatorcodehorsecomv1beta1.DbManage
 	Lock          sync.RWMutex
+	Wg            sync.WaitGroup
+	Tickers       []*time.Ticker
 }
 
 //+kubebuilder:rbac:groups=operator.codehorse.com,resources=dbmanages,verbs=get;list;watch;create;update;patch;delete

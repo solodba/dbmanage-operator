@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"time"
 
 	operatorcodehorsecomv1beta1 "github.com/solodba/dbmanage-operator/api/v1beta1"
 	"k8s.io/apimachinery/pkg/types"
@@ -22,8 +23,41 @@ func (r *DbManageReconciler) StartLoopTask() {
 			r.UpdateDbManageStatus(dbManage)
 			continue
 		}
-
+		// 获取任务开始时间
+		taskDelay := r.GetTaskDelaySeconds(dbManage.Spec.StartTime)
+		if taskDelay.Hours() < 1 {
+			operatorcodehorsecomv1beta1.L().Info().Msgf("%s任务还有%.1f分钟后开始执行", dbManage.Name, taskDelay.Minutes())
+		} else {
+			operatorcodehorsecomv1beta1.L().Info().Msgf("%s任务还有%.1f小时后开始执行", dbManage.Name, taskDelay.Hours())
+		}
+		// 更新任务状态
+		dbManage.Status.Active = true
+		dbManage.Status.NextTime = int(r.GetTaskNextTime(taskDelay.Seconds()).Unix())
+		r.UpdateDbManageStatus(dbManage)
+		// 执行指定任务
+		ticker := time.NewTicker(taskDelay)
+		r.Tickers = append(r.Tickers, ticker)
+		r.Wg.Add(1)
+		go func(dbManage *operatorcodehorsecomv1beta1.DbManage) {
+			defer r.Wg.Done()
+			for {
+				<-ticker.C
+				// 重置ticker
+				ticker.Reset(time.Minute * time.Duration(dbManage.Spec.Period))
+				// 更新任务状态
+				dbManage.Status.Active = true
+				dbManage.Status.NextTime = int(r.GetTaskNextTime(float64(dbManage.Spec.Period)).Unix())
+				switch dbManage.Spec.Flag {
+				case 0:
+				case 1:
+				default:
+				}
+				// 更新任务状态
+				r.UpdateDbManageStatus(dbManage)
+			}
+		}(dbManage)
 	}
+	r.Wg.Wait()
 }
 
 // 更新任务的Status信息

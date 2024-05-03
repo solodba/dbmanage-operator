@@ -69,7 +69,7 @@ func (r *DbManageReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	}
 	// 任务存在, 则对比队列中的任务是否发生改变
 	if dbManage, ok := r.DbManageQueue[dbManageK8s.Name]; ok {
-		if reflect.DeepEqual(dbManageK8s, dbManage) {
+		if reflect.DeepEqual(dbManageK8s.Spec, dbManage.Spec) {
 			return ctrl.Result{}, fmt.Errorf("%s任务没有发生任务变化", dbManageK8s.Name)
 		}
 	}

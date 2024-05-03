@@ -21,11 +21,12 @@ func (r *DbManageReconciler) DbBackupTask(dbManage *operatorcodehorsecomv1beta1.
 			return errx
 		}
 	}
-	backupCmd := fmt.Sprintf("mysqldump -u%s -p%s -h%s -P%d --all-databases > /tmp/dbbackup/%s.sql",
+	backupCmd := fmt.Sprintf("mysqldump -u%s -p%s -h%s -P%d --all-databases > %s/%s.sql",
 		dbManage.Spec.Origin.Username,
 		dbManage.Spec.Origin.Password,
 		dbManage.Spec.Origin.Host,
 		dbManage.Spec.Origin.Port,
+		dbBackupDir,
 		time.Now().Format("0102150405"))
 	_, err = exec.Command("bash", "-c", backupCmd).Output()
 	if err != nil {

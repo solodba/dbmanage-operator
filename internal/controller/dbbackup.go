@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 	"time"
 
@@ -12,10 +13,28 @@ import (
 func (r *DbManageReconciler) CreateDir(dbMange *operatorcodehorsecomv1beta1.DbManage) error {
 	switch dbMange.Spec.Flag {
 	case 0:
-		_, err := exec.Command("mkdir -p /tmp/dbbackup").Output()
+		_, err := os.Stat("/tmp/dbbackup")
+		if err != nil {
+			if errx := os.MkdirAll("/tmp/dbbackup", 0700); errx == nil {
+				operatorcodehorsecomv1beta1.L().Info().Msgf("/tmp/dbbackup文件创建成功")
+				return nil
+			} else {
+				operatorcodehorsecomv1beta1.L().Info().Msgf("/tmp/dbbackup文件创建失败, 原因: %s", errx.Error())
+				return errx
+			}
+		}
 		return err
 	case 1:
-		_, err := exec.Command("mkdir -p /tmp/dbcheck").Output()
+		_, err := os.Stat("/tmp/dbcheck")
+		if err != nil {
+			if errx := os.MkdirAll("/tmp/dbcheck", 0700); errx == nil {
+				operatorcodehorsecomv1beta1.L().Info().Msgf("/tmp/dbcheck文件创建成功")
+				return nil
+			} else {
+				operatorcodehorsecomv1beta1.L().Info().Msgf("/tmp/dbcheck文件创建失败, 原因: %s", errx.Error())
+				return errx
+			}
+		}
 		return err
 	default:
 		return fmt.Errorf("不支持该类型的任务")

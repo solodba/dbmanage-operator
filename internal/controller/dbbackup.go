@@ -11,6 +11,7 @@ import (
 
 // 数据库备份任务
 func (r *DbManageReconciler) DbBackupTask(dbManage *operatorcodehorsecomv1beta1.DbManage) error {
+	// 备份任务
 	dbBackupDir := "/tmp/dbbackup"
 	_, err := os.Stat(dbBackupDir)
 	if err != nil {
@@ -21,16 +22,19 @@ func (r *DbManageReconciler) DbBackupTask(dbManage *operatorcodehorsecomv1beta1.
 			return errx
 		}
 	}
-	backupCmd := fmt.Sprintf("mysqldump -u%s -p%s -h%s -P%d --all-databases > %s/%s.sql",
+	fileName := time.Now().Format("0102150405") + ".sql"
+	backupCmd := fmt.Sprintf("mysqldump -u%s -p%s -h%s -P%d --all-databases > %s/%s",
 		dbManage.Spec.Origin.Username,
 		dbManage.Spec.Origin.Password,
 		dbManage.Spec.Origin.Host,
 		dbManage.Spec.Origin.Port,
 		dbBackupDir,
-		time.Now().Format("0102150405"))
+		fileName)
 	_, err = exec.Command("bash", "-c", backupCmd).Output()
 	if err != nil {
 		return err
 	}
+	// 同步备份文件到MinIO
+
 	return nil
 }

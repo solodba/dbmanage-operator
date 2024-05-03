@@ -7,6 +7,7 @@ metadata:
   name: dbmanage-sample
 spec:
   enable: true
+  flag: 0
   startTime: "13:35"
   period: 1
   origin:

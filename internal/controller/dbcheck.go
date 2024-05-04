@@ -41,7 +41,7 @@ func (r *DbManageReconciler) DbCheckTask(dbManage *operatorcodehorsecomv1beta1.D
 	if err != nil {
 		return err
 	}
-	f, err := os.Open(fmt.Sprintf("%s/%s", dbcheckCmd, fileName))
+	f, err := os.Open(fmt.Sprintf("%s/%s", dbCheckDir, fileName))
 	if err != nil {
 		operatorcodehorsecomv1beta1.L().Error().Msgf("打开数据库状态检查文件%s失败", fileName)
 		return err
